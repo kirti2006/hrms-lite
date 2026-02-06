@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HRMS Lite</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>HRMS Lite Dashboard</h1>
+
+<div class="container">
+
+    <h2>Add Employee</h2>
+    <input id="emp_id" placeholder="Employee ID">
+    <input id="name" placeholder="Full Name">
+    <input id="email" placeholder="Email">
+    <input id="dept" placeholder="Department">
+    <button onclick="addEmployee()">Add</button>
+
+    <h2>Employees List</h2>
+    <table id="empTable" border="1"></table>
+
+    <h2>Mark Attendance</h2>
+    <input id="att_emp_id" placeholder="Employee ID">
+    <input type="date" id="date">
+    <select id="status">
+        <option>Present</option>
+        <option>Absent</option>
+    </select>
+    <button onclick="markAttendance()">Mark</button>
+
+    <h2>View Attendance</h2>
+    <input id="view_emp_id" placeholder="Employee ID">
+    <button onclick="viewAttendance()">View</button>
+    <table id="attTable" border="1"></table>
+
+</div>
+
+<script>
+async function addEmployee() {
+    const res = await fetch('/api/employees', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            emp_id: document.getElementById('emp_id').value,
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            department: document.getElementById('dept').value
+        })
+    });
+
+    const data = await res.json();
+    alert(data.message || data.error);
+    loadEmployees();
+}
+
+async function loadEmployees() {
+    const res = await fetch('/api/employees');
+    const data = await res.json();
+    empTable.innerHTML = "<tr><th>ID</th><th>Name</th><th>Email</th><th>Dept</th><th>Action</th></tr>";
+    data.forEach(e => {
+        empTable.innerHTML += `
+        <tr>
+            <td>${e.emp_id}</td>
+            <td>${e.name}</td>
+            <td>${e.email}</td>
+            <td>${e.department}</td>
+            <td><button onclick="deleteEmp('${e.emp_id}')">Delete</button></td>
+        </tr>`;
+    });
+}
+
+async function deleteEmp(id){
+    await fetch('/api/employees/'+id, {method:'DELETE'});
+    loadEmployees();
+}
+
+async function markAttendance(){
+    const res = await fetch('/api/attendance', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+            emp_id: document.getElementById('att_emp_id').value,
+            date: document.getElementById('date').value,
+            status: document.getElementById('status').value
+        })
+    });
+    const data = await res.json();
+    alert(data.message || data.error);
+}
+
+async function viewAttendance(){
+    const res = await fetch('/api/attendance/'+document.getElementById('view_emp_id').value);
+    const data = await res.json();
+    attTable.innerHTML = "<tr><th>Date</th><th>Status</th></tr>";
+    data.forEach(r=>{
+        attTable.innerHTML += `<tr><td>${r.date}</td><td>${r.status}</td></tr>`;
+    });
+}
+
+loadEmployees();
+</script>
+
+</body>
+</html>
