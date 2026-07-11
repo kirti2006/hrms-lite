@@ -4,7 +4,7 @@
 
 **A modern, lightweight Human Resource Management System**
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-hrms--lite--xssl.onrender.com-6366f1?style=for-the-badge&labelColor=0a0e1a)](https://hrms-lite-xssl.onrender.com)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-hrms--lite--1--lc1j.onrender.com-6366f1?style=for-the-badge&labelColor=0a0e1a)](https://hrms-lite-1-lc1j.onrender.com)
 [![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-2.x-000000?style=for-the-badge)](https://flask.palletsprojects.com)
 [![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge)](https://sqlite.org)
@@ -143,7 +143,7 @@ This app is deployed on [Render](https://render.com):
 3. Set **Start Command**: `gunicorn app:app`
 4. Deploy — Render auto-deploys on every push to `main`
 
-**Live at:** [https://hrms-lite-xssl.onrender.com](https://hrms-lite-xssl.onrender.com)
+**Live at:** [https://hrms-lite-1-lc1j.onrender.com](https://hrms-lite-1-lc1j.onrender.com)
 
 ---
 
