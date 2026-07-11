@@ -5,10 +5,9 @@
 **A modern, lightweight Human Resource Management System**
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-hrms--lite--xssl.onrender.com-6366f1?style=for-the-badge&labelColor=0a0e1a)](https://hrms-lite-xssl.onrender.com)
-[![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![Flask](https://img.shields.io/badge/Flask-2.x-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
-[![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-2.x-000000?style=for-the-badge)](https://flask.palletsprojects.com)
+[![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge)](https://sqlite.org)
 
 *Manage your team effortlessly — employees, attendance, and analytics all in one beautiful dashboard.*
 
@@ -145,24 +144,6 @@ This app is deployed on [Render](https://render.com):
 4. Deploy — Render auto-deploys on every push to `main`
 
 **Live at:** [https://hrms-lite-xssl.onrender.com](https://hrms-lite-xssl.onrender.com)
-
----
-
-## 🤝 Contributing
-
-Contributions, issues and feature requests are welcome!
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
