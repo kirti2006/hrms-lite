@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HRMS Lite — A modern Human Resource Management System for managing employees and attendance tracking.">
+    <title>HRMS Lite — HR Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Lucide icons via CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- ===================== TOAST CONTAINER ===================== -->
+<div id="toast-container"></div>
+
+<!-- ===================== APP WRAPPER ===================== -->
+<div class="app-wrapper">
+
+  <!-- ========== HEADER ========== -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="brand-icon">🏢</div>
+      <span class="brand-name">HRMS Lite</span>
+      <span class="brand-badge">v2.0</span>
+    </div>
+
+    <nav class="header-nav" role="tablist" aria-label="Main Navigation">
+      <button id="tab-dashboard" class="nav-tab active" role="tab" aria-selected="true"  onclick="showSection('dashboard')">
+        📊 Dashboard
+      </button>
+      <button id="tab-employees" class="nav-tab" role="tab" aria-selected="false" onclick="showSection('employees')">
+        👥 Employees
+      </button>
+      <button id="tab-attendance" class="nav-tab" role="tab" aria-selected="false" onclick="showSection('attendance')">
+        📅 Attendance
+      </button>
+    </nav>
+
+    <div class="header-time" id="live-clock">—</div>
+  </header>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main-content">
+
+    <!-- ====== DASHBOARD SECTION ====== -->
+    <section id="section-dashboard" class="section active" role="tabpanel">
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon indigo">👥</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Total Employees</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon emerald">✅</div>
+          <div class="stat-value" id="stat-present">—</div>
+          <div class="stat-label">Present Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon rose">❌</div>
+          <div class="stat-value" id="stat-absent">—</div>
+          <div class="stat-label">Absent Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon sky">🏢</div>
+          <div class="stat-value" id="stat-depts">—</div>
+          <div class="stat-label">Departments</div>
+        </div>
+      </div>
+
+      <!-- Quick Add Employee -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">➕</div>
+          <div>
+            <div class="card-title">Add New Employee</div>
+            <div class="card-subtitle">Fill in the details below to register a new team member</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="emp_id">Employee ID</label>
+              <input class="form-input" id="emp_id" placeholder="e.g. EMP001" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="name">Full Name</label>
+              <input class="form-input" id="name" placeholder="e.g. Kirti Sharma" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email">Email Address</label>
+              <input class="form-input" id="email" type="email" placeholder="e.g. kirti@company.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="dept">Department</label>
+              <input class="form-input" id="dept" placeholder="e.g. Engineering">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btn-add-employee" onclick="addEmployee()">
+            ➕ Add Employee
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Employees Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">👥</div>
+          <div>
+            <div class="card-title">Employee Directory</div>
+            <div class="card-subtitle">All registered employees</div>
+          </div>
+        </div>
+        <div class="card-body" style="padding-top: 16px;">
+          <div class="search-row">
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input class="search-input" id="emp-search" placeholder="Search by name, ID or department…" oninput="filterEmployees()">
+            </div>
+            <button class="btn btn-ghost" onclick="loadEmployees()">🔄 Refresh</button>
+          </div>
+          <div class="table-wrapper">
+            <table id="empTable">
+              <thead>
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Department</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="empTableBody">
+                <tr>
+                  <td colspan="5">
+                    <div class="empty-state">
+                      <div class="empty-state-icon">👥</div>
+                      <div class="empty-state-text">Loading employees…</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====== EMPLOYEES SECTION ====== -->
+    <section id="section-employees" class="section" role="tabpanel">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">➕</div>
+          <div>
+            <div class="card-title">Register Employee</div>
+            <div class="card-subtitle">Add a new member to your organization</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="emp_id2">Employee ID</label>
+              <input class="form-input" id="emp_id2" placeholder="e.g. EMP001" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="name2">Full Name</label>
+              <input class="form-input" id="name2" placeholder="e.g. Kirti Sharma" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email2">Email Address</label>
+              <input class="form-input" id="email2" type="email" placeholder="e.g. kirti@company.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="dept2">Department</label>
+              <input class="form-input" id="dept2" placeholder="e.g. Engineering">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="addEmployee2()">
+            ➕ Add Employee
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">📋</div>
+          <div>
+            <div class="card-title">All Employees</div>
+            <div class="card-subtitle">Manage your employee roster</div>
+          </div>
+        </div>
+        <div class="card-body" style="padding-top: 16px;">
+          <div class="search-row">
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input class="search-input" id="emp-search2" placeholder="Search employees…" oninput="filterEmployees2()">
+            </div>
+            <button class="btn btn-ghost" onclick="loadEmployees()">🔄 Refresh</button>
+          </div>
+          <div class="table-wrapper">
+            <table id="empTable2">
+              <thead>
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Department</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="empTableBody2">
+                <tr>
+                  <td colspan="5">
+                    <div class="empty-state">
+                      <div class="empty-state-icon">👥</div>
+                      <div class="empty-state-text">Loading employees…</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====== ATTENDANCE SECTION ====== -->
+    <section id="section-attendance" class="section" role="tabpanel">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">✅</div>
+          <div>
+            <div class="card-title">Mark Attendance</div>
+            <div class="card-subtitle">Record daily attendance for employees</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="inline-form">
+            <div class="form-group">
+              <label class="form-label" for="att_emp_id">Employee ID</label>
+              <input class="form-input" id="att_emp_id" placeholder="e.g. EMP001">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="att_date">Date</label>
+              <input class="form-input" type="date" id="att_date">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="att_status">Status</label>
+              <select class="form-select" id="att_status">
+                <option value="Present">✅ Present</option>
+                <option value="Absent">❌ Absent</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex:0;">
+              <label class="form-label">&nbsp;</label>
+              <button class="btn btn-emerald" onclick="markAttendance()">
+                ✅ Mark
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">📊</div>
+          <div>
+            <div class="card-title">View Attendance Record</div>
+            <div class="card-subtitle">Check attendance history for any employee</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="search-row" style="margin-bottom:20px;">
+            <div class="search-input-wrap" style="max-width:300px;">
+              <span class="search-icon">🔍</span>
+              <input class="search-input" id="view_emp_id" placeholder="Enter Employee ID…">
+            </div>
+            <button class="btn btn-primary" onclick="viewAttendance()">
+              📊 View Records
+            </button>
+          </div>
+          <div class="table-wrapper">
+            <table id="attTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="attTableBody">
+                <tr>
+                  <td colspan="2">
+                    <div class="empty-state">
+                      <div class="empty-state-icon">📅</div>
+                      <div class="empty-state-text">Enter an Employee ID and click View Records</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <span>© 2026 HRMS Lite — Built with ❤️ using Flask &amp; SQLite</span>
+  </footer>
+
+</div><!-- /app-wrapper -->
+
+<!-- ===================== JAVASCRIPT ===================== -->
+<script>
+// ── Live Clock ──────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('live-clock').textContent = now.toLocaleTimeString('en-IN', {
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+  });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Set today's date as default for attendance
+document.getElementById('att_date').value = new Date().toISOString().split('T')[0];
+
+// ── Section Navigation ──────────────────────────────────
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
+  document.getElementById('section-' + name).classList.add('active');
+  const tab = document.getElementById('tab-' + name);
+  tab.classList.add('active');
+  tab.setAttribute('aria-selected', 'true');
+  if (name === 'employees') loadEmployees();
+}
+
+// ── Toast Notifications ─────────────────────────────────
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<span>${icons[type]}</span><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 350);
+  }, 3500);
+}
+
+// ── Employee Data Cache ─────────────────────────────────
+let allEmployees = [];
+
+// ── Add Employee (Dashboard) ────────────────────────────
+async function addEmployee() {
+  const emp_id     = document.getElementById('emp_id').value.trim();
+  const name       = document.getElementById('name').value.trim();
+  const email      = document.getElementById('email').value.trim();
+  const department = document.getElementById('dept').value.trim();
+
+  if (!emp_id || !name || !email || !department) {
+    showToast('Please fill in all fields.', 'error'); return;
+  }
+
+  const btn = document.getElementById('btn-add-employee');
+  btn.disabled = true; btn.textContent = '⏳ Adding…';
+
+  try {
+    const res = await fetch('/api/employees', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ emp_id, name, email, department })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(data.message || 'Employee added successfully!', 'success');
+      ['emp_id','name','email','dept'].forEach(id => document.getElementById(id).value = '');
+      loadEmployees();
+    } else {
+      showToast(data.error || 'Failed to add employee.', 'error');
+    }
+  } catch(e) {
+    showToast('Network error. Please try again.', 'error');
+  } finally {
+    btn.disabled = false; btn.innerHTML = '➕ Add Employee';
+  }
+}
+
+// ── Add Employee (Employees Tab) ────────────────────────
+async function addEmployee2() {
+  const emp_id     = document.getElementById('emp_id2').value.trim();
+  const name       = document.getElementById('name2').value.trim();
+  const email      = document.getElementById('email2').value.trim();
+  const department = document.getElementById('dept2').value.trim();
+
+  if (!emp_id || !name || !email || !department) {
+    showToast('Please fill in all fields.', 'error'); return;
+  }
+
+  try {
+    const res = await fetch('/api/employees', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ emp_id, name, email, department })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(data.message || 'Employee added!', 'success');
+      ['emp_id2','name2','email2','dept2'].forEach(id => document.getElementById(id).value = '');
+      loadEmployees();
+    } else {
+      showToast(data.error || 'Failed to add employee.', 'error');
+    }
+  } catch(e) {
+    showToast('Network error.', 'error');
+  }
+}
+
+// ── Load & Render Employees ─────────────────────────────
+async function loadEmployees() {
+  try {
+    const res  = await fetch('/api/employees');
+    allEmployees = await res.json();
+    renderEmployeeTable(allEmployees, 'empTableBody');
+    renderEmployeeTable(allEmployees, 'empTableBody2');
+    updateStats(allEmployees);
+  } catch(e) {
+    showToast('Could not load employees.', 'error');
+  }
+}
+
+function renderEmployeeTable(data, bodyId) {
+  const tbody = document.getElementById(bodyId);
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="5">
+      <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <div class="empty-state-text">No employees found.</div>
+      </div>
+    </td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(e => `
+    <tr>
+      <td><span class="emp-id-cell">${e.emp_id}</span></td>
+      <td>${e.name}</td>
+      <td>${e.email}</td>
+      <td><span class="dept-badge">${e.department}</span></td>
+      <td><button class="btn btn-danger" onclick="deleteEmp('${e.emp_id}')">🗑 Delete</button></td>
+    </tr>
+  `).join('');
+}
+
+function filterEmployees() {
+  const q = document.getElementById('emp-search').value.toLowerCase();
+  const filtered = allEmployees.filter(e =>
+    e.name.toLowerCase().includes(q) ||
+    e.emp_id.toLowerCase().includes(q) ||
+    e.department.toLowerCase().includes(q)
+  );
+  renderEmployeeTable(filtered, 'empTableBody');
+}
+
+function filterEmployees2() {
+  const q = document.getElementById('emp-search2').value.toLowerCase();
+  const filtered = allEmployees.filter(e =>
+    e.name.toLowerCase().includes(q) ||
+    e.emp_id.toLowerCase().includes(q) ||
+    e.department.toLowerCase().includes(q)
+  );
+  renderEmployeeTable(filtered, 'empTableBody2');
+}
+
+// ── Update Stats Cards ──────────────────────────────────
+function updateStats(employees) {
+  document.getElementById('stat-total').textContent = employees.length;
+  const depts = new Set(employees.map(e => e.department));
+  document.getElementById('stat-depts').textContent = depts.size || '—';
+}
+
+// ── Delete Employee ─────────────────────────────────────
+async function deleteEmp(id) {
+  if (!confirm(`Delete employee ${id}? This action cannot be undone.`)) return;
+  try {
+    const res = await fetch('/api/employees/' + id, { method: 'DELETE' });
+    const data = await res.json();
+    if (res.ok) {
+      showToast('Employee removed successfully.', 'success');
+      loadEmployees();
+    } else {
+      showToast(data.error || 'Delete failed.', 'error');
+    }
+  } catch(e) {
+    showToast('Network error.', 'error');
+  }
+}
+
+// ── Mark Attendance ─────────────────────────────────────
+async function markAttendance() {
+  const emp_id = document.getElementById('att_emp_id').value.trim();
+  const date   = document.getElementById('att_date').value;
+  const status = document.getElementById('att_status').value;
+
+  if (!emp_id || !date) {
+    showToast('Please enter Employee ID and Date.', 'error'); return;
+  }
+
+  try {
+    const res = await fetch('/api/attendance', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ emp_id, date, status })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`Attendance marked: ${status} for ${emp_id}`, 'success');
+      document.getElementById('att_emp_id').value = '';
+    } else {
+      showToast(data.error || 'Could not mark attendance.', 'error');
+    }
+  } catch(e) {
+    showToast('Network error.', 'error');
+  }
+}
+
+// ── View Attendance ─────────────────────────────────────
+async function viewAttendance() {
+  const emp_id = document.getElementById('view_emp_id').value.trim();
+  if (!emp_id) { showToast('Please enter an Employee ID.', 'error'); return; }
+
+  try {
+    const res  = await fetch('/api/attendance/' + emp_id);
+    const data = await res.json();
+    const tbody = document.getElementById('attTableBody');
+
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="2">
+        <div class="empty-state">
+          <div class="empty-state-icon">📅</div>
+          <div class="empty-state-text">No attendance records found for <strong>${emp_id}</strong>.</div>
+        </div>
+      </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(r => {
+      const badge = r.status === 'Present'
+        ? `<span class="badge badge-present">${r.status}</span>`
+        : `<span class="badge badge-absent">${r.status}</span>`;
+      return `<tr><td>${r.date}</td><td>${badge}</td></tr>`;
+    }).join('');
+
+    // Update stats
+    const present = data.filter(r => r.status === 'Present').length;
+    const absent  = data.filter(r => r.status === 'Absent').length;
+    document.getElementById('stat-present').textContent = present;
+    document.getElementById('stat-absent').textContent  = absent;
+
+  } catch(e) {
+    showToast('Could not fetch attendance records.', 'error');
+  }
+}
+
+// ── Initial Load ────────────────────────────────────────
+loadEmployees();
+</script>
+
+</body>
+</html>
